@@ -1,0 +1,3 @@
+Script to wrap mongodump as a nightly backup, and keeps Sunday's for archival purposes.
+
+Run it as a cron.

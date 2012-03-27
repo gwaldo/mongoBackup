@@ -1,0 +1,32 @@
+#!/bin/bash
+
+## Determine day of week. If Sunday, do an archival backup.
+## Otherwise, do by day of week.
+
+DOW=`/bin/date +%a`
+REPLSET="replSetName"
+
+if [ $DOW == "Sun" ]; then
+	DSTRING=`/bin/date +%Y-%m-%d`
+	ARCHSTRING="$REPLSET.$DOW.$DSTRING.tgz"
+else
+	ARCHSTRING="$REPLSET.$DOW"
+fi
+
+BACKUP_DIR="/var/shared/backup/mongodb/$ARCHSTRING"
+
+CRON="backup.$ARCHSTRING"
+LOCKFILE="/tmp/cron.$CRON.lock"
+
+if [ -f "$LOCKFILE" ]; then
+	/usr/bin/logger -t mongodb_backup "$ARCHSTRING locked; skipping"
+	exit 0
+fi
+
+touch "$LOCKFILE"
+/usr/bin/logger -t mongodb_backup "$ARCHSTRING started"
+rm -f $BACKUP_DIR
+mkdir $BACKUP_DIR
+/opt/mongodb-2.0.1/bin/mongodump --host server.domain --out $BACKUP_DIR
+rm -f "$LOCKFILE"
+/usr/bin/logger -t mongodb_backup "$ARCHSTRING finished"
