@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 
 ## Determine day of week. If Sunday, do an archival backup.
 ## Otherwise, do by day of week.
